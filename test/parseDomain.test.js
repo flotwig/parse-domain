@@ -210,6 +210,46 @@ describe("parseDomain(url)", () => {
         }
     );
 
+    test(
+        "should let the user pass a regex to match any string as a fallback",
+        () => {
+            const options = {customTlds: /(localhost|\.[^.]+)$/};
+
+            expect(parseDomain("www.example.co.uk", options)).toEqual({
+                subdomain: "www",
+                domain: "example",
+                tld: "co.uk",
+            });
+            expect(parseDomain("mymachine.foobarbaz", options)).toEqual({
+                subdomain: "",
+                domain: "mymachine",
+                tld: "foobarbaz",
+            });
+            expect(parseDomain("local.mymachine.foobarbaz", options)).toEqual({
+                subdomain: "local",
+                domain: "mymachine",
+                tld: "foobarbaz",
+            });
+            expect(parseDomain("localhost", options)).toEqual({
+                subdomain: "",
+                domain: "",
+                tld: "localhost",
+            });
+            expect(parseDomain("localhost:8080", options)).toEqual({
+                subdomain: "",
+                domain: "",
+                tld: "localhost",
+            });
+
+            // Sanity check if the option does not misbehave
+            expect(parseDomain("http://example.com", options)).toEqual({
+                subdomain: "",
+                domain: "example",
+                tld: "com",
+            });
+        }
+    );
+
     describe("real-world use cases", () => {
         // See https://github.com/peerigon/parse-domain/pull/65
         test("should parse police.uk as tld", () => {

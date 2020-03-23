@@ -11,15 +11,6 @@ const dot = /\./g;
 const emptyArr = [];
 
 function matchTld(hostname, options) {
-    // for potentially unrecognized tlds, try matching against custom tlds
-    if (options.customTlds) {
-        // try matching against a built regexp of custom tlds
-        const tld = hostname.match(options.customTlds);
-
-        if (tld !== null) {
-            return tld[0];
-        }
-    }
     const domains = hostname.split(".");
     const icannTlds = lookUp(icannTrie, domains);
     const privateTlds = options.privateTlds ? lookUp(privateTrie, domains) : emptyArr;
@@ -29,6 +20,16 @@ function matchTld(hostname, options) {
     }
     if (icannTlds.length > 0) {
         return "." + icannTlds.join(".");
+    }
+
+    // for potentially unrecognized tlds, try matching against custom tlds
+    if (options.customTlds) {
+        // try matching against a built regexp of custom tlds
+        const tld = hostname.match(options.customTlds);
+
+        if (tld !== null) {
+            return tld[0];
+        }
     }
 
     return null;
